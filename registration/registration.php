@@ -13,7 +13,7 @@ session_start();
 </head>
 
 <body>
-  <form action="create_user.php" method="POST">
+  <form action="registration_validation.php" method="POST">
     <fieldset>
       <label for="username">username</label>
       <input type="text" name="username" id="username" required>
@@ -61,4 +61,3 @@ session_start();
 </body>
 
 </html>
-<?php
