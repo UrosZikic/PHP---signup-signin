@@ -11,7 +11,7 @@ class Connect_Database
   {
     try {
       $this->pdo = new PDO($this->dsn, $this->username, $this->password, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, // throw exceptions
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
       ]);
     } catch (PDOException $e) {
