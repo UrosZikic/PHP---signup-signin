@@ -1,13 +1,17 @@
 <?php
 require_once 'SQL/connect_database.php';
+
 session_start();
+// reset on visit
 $_SESSION['error'] = "";
+// necessary in order to call the right function
+$request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 
 
 class Userbase_controller extends Connect_Database
 {
-  public function validate()
+  public function validate_registration()
   {
     // validate input values
     $name = $_POST['name'] ?? false;
@@ -23,7 +27,6 @@ class Userbase_controller extends Connect_Database
 
       Header("Location: /register?error=" . $_SESSION['error']);
       exit();
-
     }
 
     // validate request
@@ -160,16 +163,15 @@ class Userbase_controller extends Connect_Database
   private function read($email)
   {
     try {
-      $query = "SELECT email FROM userbase WHERE email = :email";
+      $query = "SELECT * FROM userbase WHERE email = :email";
       $stmt = $this->pdo->prepare($query);
       $stmt->bindParam(":email", $email);
       $stmt->execute();
-      return $stmt->fetch(PDO::FETCH_ASSOC);
+      $user = $stmt->fetch(PDO::FETCH_ASSOC);
+      return $user;
     } catch (PDOException $e) {
       $_SESSION['error'] = 'validation failed';
       $this->fileto();
-
-
       Header("Location: /register?error=" . $_SESSION['error']);
     }
   }
@@ -188,6 +190,7 @@ class Userbase_controller extends Connect_Database
       $stmt->execute();
 
       $this->fileto();
+      $_SESSION['error'] = null;
 
       header("Location: /sign-in");
       exit();
@@ -199,6 +202,73 @@ class Userbase_controller extends Connect_Database
       Header("Location: /register?error=" . $_SESSION['error']);
     }
   }
+
+  public function validate_signin()
+  {
+    // validate input values
+    $email = $_POST['email'] ?? false;
+    $password = $_POST['password'] ?? false;
+
+    // validate CSRF
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+      $_SESSION['error'] = 'invalid request';
+      $this->fileto();
+
+      Header("Location: /sign-in?error=" . $_SESSION['error']);
+      exit();
+    }
+    // validate if they exist
+    if ($_SERVER['REQUEST_METHOD'] === "POST") {
+
+      if (!$email) {
+        $_SESSION['error'] = 'email-invalid';
+        $this->fileto();
+        Header("Location: /sign-in?error=" . $_SESSION['error']);
+        exit();
+
+      } else if (!$password) {
+        $_SESSION['error'] = 'password-invalid';
+        $this->fileto();
+        Header("Location: /sign-in?error=" . $_SESSION['error']);
+        exit();
+      }
+    } else {
+      $_SESSION['error'] = 'invalid-request';
+      $this->fileto();
+      Header("Location: /sign-in?error=" . $_SESSION['error']);
+    }
+
+    if (!$this->read($email)) {
+      $_SESSION['error'] = 'user-fail';
+      $this->fileto();
+      Header("Location: /sign-in?error=" . $_SESSION['error']);
+    } else {
+      $password_verify = password_verify($password, $this->read($email)["password"]);
+      $password_verify = $password_verify ? true : false;
+
+      if ($password_verify) {
+        $_SESSION['error'] = null;
+        $_SESSION['logged'] = $this->read($email)["email"];
+        Header("Location: /profile");
+      } else {
+        $_SESSION['error'] = 'password-fail';
+        Header("Location: /sign-in?error=" . $_SESSION['error']);
+      }
+    }
+  }
+
+  public function validate_signout()
+  {
+    unset($_SESSION['logged']);
+    Header("Location: /sign-in");
+    exit();
+  }
 }
 $userbase_controller = new Userbase_controller();
-$userbase_controller->validate();
+
+if ($request === '/register-user')
+  $userbase_controller->validate_registration();
+else if ($request === '/signin-user')
+  $userbase_controller->validate_signin();
+else
+  $userbase_controller->validate_signout();

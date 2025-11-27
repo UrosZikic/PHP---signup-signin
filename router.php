@@ -15,10 +15,15 @@ switch ($request) {
     require_once __DIR__ . "../front_page/views/register.php";
     break;
   case '/register-user':
+  case '/signin-user':
+  case '/signout-user':
     require_once __DIR__ . "../controllers/Userbase_Controller.php";
     break;
   case '/sign-in':
     require_once __DIR__ . "../front_page/views/sign_in.php";
+    break;
+  case '/profile':
+    require_once __DIR__ . "../front_page/views/profile.php";
     break;
   default:
     require_once __DIR__ . "/errors/404.php";
