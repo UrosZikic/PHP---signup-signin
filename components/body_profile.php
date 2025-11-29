@@ -1,33 +1,14 @@
 <?php
-require_once "SQL/connect_database.php";
-
-// validate logged session
-session_start();
-if (!isset($_SESSION['logged']))
+if (!isset($_COOKIE['logged']))
   Header("Location: /sign-in");
 
-
-class Retrieve_User extends Connect_Database
-{
-  // validate existance of the user
-  public function retrieve_user()
-  {
-    $query = "SELECT * FROM userbase WHERE email = :email";
-    $stmt = $this->pdo->prepare($query);
-    $stmt->bindParam(":email", $_SESSION['logged']["email"]);
-    $stmt->execute();
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $user;
-  }
-}
-
-$validate_user = new Retrieve_User();
-if (!$validate_user->retrieve_user())
+// validate logged session and user session
+if (!isset($_SESSION['logged']) || !isset($_SESSION['user']))
   Header("Location: /sign-in");
 ?>
 
-
 <main>
-  <h1>Dashboard: <?php echo $validate_user->retrieve_user()['name'] ?></h1>
-  <a href="/signout-user">sign out</a>
+  <h1 style="font-weight: 300; padding-left: 10px">Dashboard: <?php echo $user['name'];
+  ?></h1>
+  <a href="/profile-settings">Manage your profile</a>
 </main>

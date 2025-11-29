@@ -15,7 +15,7 @@ class Create_Userbase extends Connect_Database
     -- unsigned restricts negative id value | SQL adds it on new entry
       id int UNSIGNED AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(50) NOT NULL,
-      email VARCHAR(100) NOT NULL,
+      email VARCHAR(100) NOT NULL UNIQUE,
       password VARCHAR(100) NOT NULL,
       role VARCHAR(5) NOT NULL DEFAULT 'user',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -28,7 +28,7 @@ class Userbase extends Connect_Database
     unset($_SESSION['logged']);
   }
 
-  protected function read_from_userbase($email, $path)
+  protected function read_from_userbase($email, $path = null)
   {
     $query = "SELECT * FROM userbase WHERE email = :email";
     $stmt = $this->pdo->prepare($query);
@@ -36,5 +36,14 @@ class Userbase extends Connect_Database
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     return $user;
+  }
+
+  protected function delete_from_userbase($email)
+  {
+    $query = "DELETE FROM `userbase` WHERE email = :email";
+    $stmt = $this->pdo->prepare($query);
+    $stmt->bindParam(':email', $email);
+    $stmt->execute();
+    return true;
   }
 }

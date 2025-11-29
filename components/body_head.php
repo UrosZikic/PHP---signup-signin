@@ -7,7 +7,44 @@
   <meta name="keywords" content="HTML, CSS, JavaScript">
   <meta name="author" content="John Doe">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="<?php echo "/styles/general_styles/general_styles.css" ?>">
+  <link rel="stylesheet" href="<?php echo "/styles/form_styles/form_styles.css" ?>">
+  <link rel="stylesheet" href="<?php echo "/styles/profile_styles/profile_styles.css" ?>">
+
   <title>placeholder title</title>
 </head>
 
+
 <body>
+  <nav class="flex_default flex_align_center">
+    <a href="/" style="padding: 0">
+      <img src="images/logo.png" alt="website logo" class="logo_image">
+    </a>
+    <ul class="flex_default nav_ul_list">
+      <?php
+      if (!isset($_COOKIE['logged'])) {
+        ?>
+        <li>
+          <a href="/sign-in">Sign-in</a>
+        </li>
+        <li>
+          <a href="/register">Register</a>
+        </li>
+      <?php } else {
+        ?>
+        <li>
+          <a href="/signout-user">Sign-out</a>
+        </li>
+        <li>
+          <a href="/profile">Profile</a>
+        </li>
+      <?php }
+      ; ?>
+    </ul>
+  </nav>
