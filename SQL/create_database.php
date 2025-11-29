@@ -1,4 +1,5 @@
 <?php
+
 class Create_Database
 {
   private $dsn = "mysql:host=localhost";

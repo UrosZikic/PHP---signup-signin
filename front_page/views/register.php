@@ -6,25 +6,25 @@ require_once 'error_pool.php';
 
 ?>
 <div>
-  <p><?php if (isset($_SESSION['error']) && $_SESSION['error'] && isset($_GET['error']) && strlen($_GET['error']))
+  <p><?php if (isset($_SESSION['error']) && isset($_GET['error']) && strlen($_GET['error']))
     echo $registration_error_pool[$_SESSION['error']] ?></p>
     <form action="/register-user" method="POST">
       <input type="hidden" name="csrf_token" value="<?php echo $csrf_token ?>" hidden>
     <div>
       <label for="name">Name</label>
-      <input type="text" name="name" id="name">
+      <input type="text" name="name" id="name" required>
     </div>
     <div>
       <label for="email">Email</label>
-      <input type="email" name="email" id="email">
+      <input type="email" name="email" id="email" required>
     </div>
     <div>
       <label for="password">Password</label>
-      <input type="password" name="password" id="password">
+      <input type="password" name="password" id="password" required>
     </div>
     <div>
       <label for="re_password">Repeat password</label>
-      <input type="password" name="re_password" id="re_password">
+      <input type="password" name="re_password" id="re_password" required>
     </div>
     <button type="submit" id="submit">Register</button>
   </form>

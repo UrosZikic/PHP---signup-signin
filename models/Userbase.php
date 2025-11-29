@@ -1,6 +1,6 @@
 <?php
-require_once "../SQL/connect_database.php";
-
+// __DIR__ resolves pathing issue
+require_once __DIR__ . '/../SQL/connect_database.php';
 class Userbase extends Connect_Database
 {
   public $userbase;
@@ -12,14 +12,29 @@ class Userbase extends Connect_Database
     parent::__construct();
   }
 
-  public function insert_into_userbase($name, $email, $password)
+  protected function insert_into_userbase($name, $email, $password)
   {
-    $this->query = "INSERT INTO 'userbase' (name, email, password) VALUES (:name, :email, :password)";
+    $this->query = "INSERT INTO userbase (name, email, password) VALUES (:name, :email, :password)";
     $this->stmt = $this->pdo->prepare($this->query);
     return $this->stmt->execute([
       ':name' => $name,
       ':email' => $email,
       ':password' => $password
     ]);
+  }
+
+  protected function validate_signout()
+  {
+    unset($_SESSION['logged']);
+  }
+
+  protected function read_from_userbase($email, $path)
+  {
+    $query = "SELECT * FROM userbase WHERE email = :email";
+    $stmt = $this->pdo->prepare($query);
+    $stmt->bindParam(":email", $email);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $user;
   }
 }

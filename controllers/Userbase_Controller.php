@@ -1,5 +1,6 @@
 <?php
-require_once 'SQL/connect_database.php';
+// __DIR__ resolves pathing issue
+require_once __DIR__ . '/../models/Userbase.php';
 
 session_start();
 // reset on visit
@@ -9,7 +10,7 @@ $request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 
 
-class Userbase_controller extends Connect_Database
+class Userbase_controller extends Userbase
 {
   public function validate_registration()
   {
@@ -23,7 +24,7 @@ class Userbase_controller extends Connect_Database
     // validate CSRF
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
       $_SESSION['error'] = 'invalid request';
-      $this->fileto();
+      $this->fileto('register');
 
       Header("Location: /register?error=" . $_SESSION['error']);
       exit();
@@ -34,26 +35,26 @@ class Userbase_controller extends Connect_Database
 
       if (!$name) {
         $_SESSION['error'] = 'name-invalid';
-        $this->fileto();
+        $this->fileto('register');
         Header("Location: /register?error=" . $_SESSION['error']);
         exit();
 
       } else if (!$email) {
         $_SESSION['error'] = 'email-invalid';
-        $this->fileto();
+        $this->fileto('register');
 
         Header("Location: /register?error=" . $_SESSION['error']);
         exit();
 
       } else if (!$password) {
         $_SESSION['error'] = 'password-invalid';
-        $this->fileto();
+        $this->fileto('register');
         Header("Location: /register?error=" . $_SESSION['error']);
         exit();
 
       } else if (!$re_password) {
         $_SESSION['error'] = 're_password-invalid';
-        $this->fileto();
+        $this->fileto('register');
 
         Header("Location: /register?error=" . $_SESSION['error']);
         exit();
@@ -64,14 +65,14 @@ class Userbase_controller extends Connect_Database
       // validate username
       if (empty($name)) {
         $_SESSION['error'] = 'name-empty';
-        $this->fileto();
+        $this->fileto('register');
 
         Header("Location: /register?error=" . $_SESSION['error']);
         exit();
 
       } else if (preg_match('/\d/', $name)) {
         $_SESSION['error'] = 'name-number';
-        $this->fileto();
+        $this->fileto('register');
 
         Header("Location: /register?error=" . $_SESSION['error']);
         exit();
@@ -80,14 +81,14 @@ class Userbase_controller extends Connect_Database
       // validate email 
       if (empty($email)) {
         $_SESSION['error'] = 'email-empty';
-        $this->fileto();
+        $this->fileto('register');
 
         Header("Location: /register?error=" . $_SESSION['error']);
         exit();
 
       } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $_SESSION['error'] = 'email-invalid';
-        $this->fileto();
+        $this->fileto('register');
 
         Header("Location: /register?error=" . $_SESSION['error']);
         exit();
@@ -97,81 +98,85 @@ class Userbase_controller extends Connect_Database
       //validate password
       if (empty($password)) {
         $_SESSION['error'] = 'password-empty';
-        $this->fileto();
+        $this->fileto('register');
         Header("Location: /register?error=" . $_SESSION['error']);
         exit();
 
       } else if (!preg_match('/[A-Z]/', $password)) {
         $_SESSION['error'] = 'password-capitalize';
-        $this->fileto();
+        $this->fileto('register');
         Header("Location: /register?error=" . $_SESSION['error']);
         exit();
 
       } else if (!preg_match('/[a-z]/', $password)) {
         $_SESSION['error'] = 'password-letter';
-        $this->fileto();
+        $this->fileto('register');
         Header("Location: /register?error=" . $_SESSION['error']);
         exit();
 
       } else if (!preg_match('/.{10,}/', $password)) {
         $_SESSION['error'] = 'password-short';
-        $this->fileto();
+        $this->fileto('register');
         Header("Location: /register?error=" . $_SESSION['error']);
         exit();
 
       } else if (!preg_match('/\d/', $password)) {
         $_SESSION['error'] = 'password-number';
-        $this->fileto();
+        $this->fileto('register');
         Header("Location: /register?error=" . $_SESSION['error']);
         exit();
 
       } else if (!preg_match('/[\W_]/', $password)) {
         $_SESSION['error'] = 'password-symbol';
-        $this->fileto();
+        $this->fileto('register');
         Header("Location: /register?error=" . $_SESSION['error']);
         exit();
 
       } else if ($password !== $re_password) {
         $_SESSION['error'] = 'password-mismatch';
-        $this->fileto();
+        $this->fileto('register');
         Header("Location: /register?error=" . $_SESSION['error']);
         exit();
 
       }
-      if (!$this->read($email)) {
+      if (!$this->read($email, 'register')) {
         $this->create($name, $email, $password);
       } else {
         $_SESSION['error'] = 'user-exists';
-        $this->fileto();
+        $this->fileto('register');
         Header("Location: /register?error=" . $_SESSION['error']);
       }
     } else {
       $_SESSION['error'] = 'invalid-request';
-      $this->fileto();
+      $this->fileto('register');
       Header("Location: /register?error=" . $_SESSION['error']);
     }
   }
 
-  private function fileto()
+  private function fileto($path)
   {
-    //document registration attempt
-    $document_message = "attempt to register user: " . $_POST['email'] . " - outcome: " . (isset($_SESSION['error']) && $_SESSION['error'] ? $_SESSION['error'] : " success - ") . " - Request made on " . date("F d Y H:i:s", filemtime("filesystem/registration_attempt.txt")) . " IP: " . $_SERVER['REMOTE_ADDR'] . " Browser: " . $_SERVER['HTTP_USER_AGENT'] . PHP_EOL;
 
-    file_put_contents('filesystem/registration_attempt.txt', $document_message, FILE_APPEND);
+    //document registration attempt
+    $document_message = "attempt to $path user: " . $_POST['email'] . " - outcome: " . (isset($_SESSION['error']) && $_SESSION['error'] ? $_SESSION['error'] : " success - ") . " - Request made on ";
+    if ($path === 'register') {
+      $document_message .= date("F d Y H:i:s", filemtime("filesystem/registration_attempt.txt")) . " IP: " . $_SERVER['REMOTE_ADDR'] . " Browser: " . $_SERVER['HTTP_USER_AGENT'] . PHP_EOL;
+      file_put_contents('filesystem/registration_attempt.txt', $document_message, FILE_APPEND);
+    } else if ($path === 'signin') {
+      $document_message .= date("F d Y H:i:s", filemtime("filesystem/signin_attempt.txt")) . " IP: " . $_SERVER['REMOTE_ADDR'] . " Browser: " . $_SERVER['HTTP_USER_AGENT'] . PHP_EOL;
+      file_put_contents('filesystem/signin_attempt.txt', $document_message, FILE_APPEND);
+    } else {
+      $signout_message = "attempt to logout the user " . $_POST["email"] . " - successful " . "- Request made on " . date("F d Y H:i:s", filemtime("filesystem/signout_attempt.txt")) . " IP: " . $_SERVER['REMOTE_ADDR'] . " Browser: " . $_SERVER['HTTP_USER_AGENT'] . PHP_EOL;
+      file_put_contents('filesystem/signout_attempt.txt', $signout_message, FILE_APPEND);
+    }
   }
 
-  private function read($email)
+  private function read($email, $path = null)
   {
     try {
-      $query = "SELECT * FROM userbase WHERE email = :email";
-      $stmt = $this->pdo->prepare($query);
-      $stmt->bindParam(":email", $email);
-      $stmt->execute();
-      $user = $stmt->fetch(PDO::FETCH_ASSOC);
-      return $user;
+      $this->read_from_userbase($email, $path);
     } catch (PDOException $e) {
       $_SESSION['error'] = 'validation failed';
-      $this->fileto();
+      $this->fileto($path);
       Header("Location: /register?error=" . $_SESSION['error']);
     }
   }
@@ -182,23 +187,20 @@ class Userbase_controller extends Connect_Database
 
     try {
       $password_hashed = password_hash($password, PASSWORD_DEFAULT);
-      $query = "INSERT INTO userbase (name, email, password) VALUES(:name, :email, :password)";
-      $stmt = $this->pdo->prepare($query);
-      $stmt->bindParam(":name", $name);
-      $stmt->bindParam(":email", $email);
-      $stmt->bindParam(":password", $password_hashed);
-      $stmt->execute();
-
-      $this->fileto();
+      // call Userbase model function and insert data
+      $this->insert_into_userbase($name, $email, $password_hashed);
+      // success no errors
       $_SESSION['error'] = null;
-
+      // record this attempt
+      $this->fileto('register');
+      // send the user to the next step
       header("Location: /sign-in");
       exit();
 
     } catch (PDOException $e) {
       $_SESSION['error_message'] = $e->getMessage();
       $_SESSION['error'] = 'invalid request';
-      $this->fileto();
+      $this->fileto('register');
       Header("Location: /register?error=" . $_SESSION['error']);
     }
   }
@@ -212,8 +214,7 @@ class Userbase_controller extends Connect_Database
     // validate CSRF
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
       $_SESSION['error'] = 'invalid request';
-      $this->fileto();
-
+      $this->fileto('signin');
       Header("Location: /sign-in?error=" . $_SESSION['error']);
       exit();
     }
@@ -222,48 +223,54 @@ class Userbase_controller extends Connect_Database
 
       if (!$email) {
         $_SESSION['error'] = 'email-invalid';
-        $this->fileto();
+        $this->fileto('signin');
         Header("Location: /sign-in?error=" . $_SESSION['error']);
         exit();
 
       } else if (!$password) {
         $_SESSION['error'] = 'password-invalid';
-        $this->fileto();
+        $this->fileto('signin');
         Header("Location: /sign-in?error=" . $_SESSION['error']);
         exit();
       }
     } else {
       $_SESSION['error'] = 'invalid-request';
-      $this->fileto();
+      $this->fileto('signin');
       Header("Location: /sign-in?error=" . $_SESSION['error']);
+      exit();
     }
 
-    if (!$this->read($email)) {
+    if (!$this->read($email, 'signin')) {
       $_SESSION['error'] = 'user-fail';
-      $this->fileto();
+      $this->fileto('signin');
       Header("Location: /sign-in?error=" . $_SESSION['error']);
     } else {
-      $password_verify = password_verify($password, $this->read($email)["password"]);
+      $password_verify = password_verify($password, $this->read($email, 'signin')["password"]);
       $password_verify = $password_verify ? true : false;
 
       if ($password_verify) {
         $_SESSION['error'] = null;
-        $_SESSION['logged'] = $this->read($email)["email"];
+        $_SESSION['logged'] = ["email" => $this->read($email, 'signin')["email"], "name" => $this->read($email, 'signin')["name"]];
+        $this->fileto('signin');
         Header("Location: /profile");
       } else {
         $_SESSION['error'] = 'password-fail';
+        $this->fileto('signin');
+
         Header("Location: /sign-in?error=" . $_SESSION['error']);
       }
     }
   }
 
-  public function validate_signout()
+  public function signout()
   {
-    unset($_SESSION['logged']);
+    $this->validate_signout();
+    $this->fileto('signout');
     Header("Location: /sign-in");
     exit();
   }
 }
+
 $userbase_controller = new Userbase_controller();
 
 if ($request === '/register-user')
@@ -271,4 +278,4 @@ if ($request === '/register-user')
 else if ($request === '/signin-user')
   $userbase_controller->validate_signin();
 else
-  $userbase_controller->validate_signout();
+  $userbase_controller->signout();

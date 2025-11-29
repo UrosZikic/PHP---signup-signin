@@ -1,3 +1,10 @@
 pdo.php
 admin.php
-registration_report.txt
+vendor/
+config/
+composer.json
+composer.lock
+registration_attempt.txt
+signin_attempt.txt
+signout_attempt.txt
+.env

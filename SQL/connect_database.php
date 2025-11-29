@@ -1,5 +1,5 @@
 <?php
-
+require_once "create_database.php";
 class Connect_Database
 {
   private $dsn = "mysql:host=localhost;dbname=registration;";

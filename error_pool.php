@@ -1,6 +1,6 @@
 <?php
-
-$error = $_SESSION['error'];
+if (isset($_SESSION['error']))
+  $error = $_SESSION['error'];
 
 $registration_error_pool = [
   'invalid-request' => 'registration failed',
