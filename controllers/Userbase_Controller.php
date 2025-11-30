@@ -1,7 +1,6 @@
 <?php
 // __DIR__ resolves pathing issue
 require_once __DIR__ . '/../models/Userbase.php';
-
 session_start();
 // reset on visit
 $_SESSION['error'] = "";
@@ -171,6 +170,9 @@ class Userbase_controller extends Userbase
     } else if ($path === 'delete') {
       $document_message .= date("F d Y H:i:s", filemtime("filesystem/delete_attempt.txt")) . " IP: " . $_SERVER['REMOTE_ADDR'] . " Browser: " . $_SERVER['HTTP_USER_AGENT'] . PHP_EOL;
       file_put_contents('filesystem/signin_attempt.txt', $document_message, FILE_APPEND);
+    } else if ($path === 'edit') {
+      $document_message .= date("F d Y H:i:s", filemtime("filesystem/edit_attempt.txt")) . " IP: " . $_SERVER['REMOTE_ADDR'] . " Browser: " . $_SERVER['HTTP_USER_AGENT'] . PHP_EOL;
+      file_put_contents('filesystem/edit_attempt.txt', $document_message, FILE_APPEND);
     } else {
       $signout_message = "attempt to logout the user " . $_POST["email"] . " - successful " . "- Request made on " . date("F d Y H:i:s", filemtime("filesystem/signout_attempt.txt")) . " IP: " . $_SERVER['REMOTE_ADDR'] . " Browser: " . $_SERVER['HTTP_USER_AGENT'] . PHP_EOL;
       file_put_contents('filesystem/signout_attempt.txt', $signout_message, FILE_APPEND);
@@ -215,42 +217,55 @@ class Userbase_controller extends Userbase
     }
   }
 
-  public function validate_signin()
+  public function validate_user_request($fileto, $header, $email_post, $password_post)
   {
     // validate input values
-    $email = $_POST['email'] ?? false;
-    $password = $_POST['password'] ?? false;
+    $email = $email_post ?? false;
+    $password = $password_post ?? false;
+
 
     // validate CSRF
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
       $_SESSION['error'] = 'invalid-request';
-      $this->fileto('signin');
-      Header("Location: /sign-in");
+      $this->fileto($fileto);
+      Header("Location: /$header");
       exit();
     }
+
     // validate if they exist
     if ($_SERVER['REQUEST_METHOD'] === "POST") {
       // validate email
       if (!$email) {
         $_SESSION['error'] = 'email-invalid';
-        $this->fileto('signin');
-        Header("Location: /sign-in");
+        $this->fileto($fileto);
+        Header("Location: /$header");
         exit();
         // validate password
       } else if (!$password) {
         $_SESSION['error'] = 'password-invalid';
-        $this->fileto('signin');
-        Header("Location: /sign-in");
+        $this->fileto($fileto);
+        Header("Location: /$header");
         exit();
       }
+
+
+      if ($fileto === 'signin') {
+        $this->signin($email, $password);
+      } else if ($fileto === 'delete')
+        $this->delete_user($email, $password);
+
     } else {
       // if request method is not post, cancel signin
       $_SESSION['error'] = 'invalid-request';
-      $this->fileto('signin');
-      Header("Location: /sign-in");
+      $this->fileto($fileto);
+      Header("Location: /$header");
       exit();
     }
 
+  }
+
+  private function signin($email, $password)
+  {
     if (!$this->read($email, 'signin')) {
       $_SESSION['error'] = 'user-fail';
       $this->fileto('signin');
@@ -266,7 +281,7 @@ class Userbase_controller extends Userbase
         $_SESSION['logged'] = ["email" => $this->read($email, 'signin')["email"], "name" => $this->read($email, 'signin')["name"]];
         $_SESSION['user'] = $this->read($email, null);
         $this->fileto('signin');
-        setcookie('logged', true, time() + 1800, '/', 'localhost', true, true);
+        setcookie('auth', true, time() + 1800, '/', 'localhost', true, true);
         Header("Location: /profile");
         exit();
       } else {
@@ -278,51 +293,9 @@ class Userbase_controller extends Userbase
     }
   }
 
-  public function signout()
+
+  private function delete_user($email, $password)
   {
-    $this->validate_signout();
-    $this->fileto('signout');
-    setcookie('logged', false, time() - 1, '/', 'localhost', true, true);
-    unset($_SESSION['logged']);
-    Header("Location: /sign-in");
-    exit();
-  }
-
-  public function delete_user()
-  {
-    $email = $_POST['email'] ?? false;
-    $password = $_POST['password'] ?? false;
-
-    // validate CSRF
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-      $_SESSION['error'] = 'invalid-request';
-      $this->fileto('delete');
-      Header("Location: /profile-settings");
-      exit();
-    }
-    // validate if they exist
-    if ($_SERVER['REQUEST_METHOD'] === "POST") {
-      // validate email
-      if (!$email) {
-        $_SESSION['error'] = 'email-invalid';
-        $this->fileto('delete');
-        Header("Location: /profile-settings");
-        exit();
-        // validate password
-      } else if (!$password) {
-        $_SESSION['error'] = 'password-invalid';
-        $this->fileto('delete');
-        Header("Location: /profile-settings");
-        exit();
-      }
-    } else {
-      // if request method is not post, cancel signin
-      $_SESSION['error'] = 'invalid-request';
-      $this->fileto('delete');
-      Header("Location: /profile-settings");
-      exit();
-    }
-
     if (!$this->read($email, 'signin')) {
       $_SESSION['error'] = 'user-fail';
       $this->fileto('delete');
@@ -347,7 +320,7 @@ class Userbase_controller extends Userbase
         $_SESSION['logged'] = null;
         $_SESSION['user'] = null;
         $this->fileto('delete');
-        setcookie('logged', false, time() - 1, '/', 'localhost', true, true);
+        setcookie('auth', false, time() - 1, '/', 'localhost', true, true);
         $this->delete_from_userbase($email);
         Header("Location: /home");
         exit();
@@ -362,6 +335,67 @@ class Userbase_controller extends Userbase
       }
     }
   }
+  public function edit_user_name()
+  {
+    $name = $_POST['name'] ?? false;
+    $email = $_POST['email'] ?? false;
+    $password = $_POST['password'] ?? false;
+
+    // validate username
+    if (empty($name)) {
+      $_SESSION['error'] = 'name-empty';
+      $this->fileto('edit');
+
+      Header("Location: /profile-settings");
+      exit();
+
+    } else if (preg_match('/\d/', $name)) {
+      $_SESSION['error'] = 'name-number';
+      $this->fileto('edit');
+      Header("Location: /profile-settings");
+      exit();
+
+    }
+    $this->validate_user_request('edit', 'change-name', $email, $password);
+    $user = $this->read($email);
+    if (!$user) {
+      $_SESSION['error'] = 'email-invalid';
+      $this->fileto('edit');
+
+      Header("Location: /profile-settings");
+      exit();
+    } else if (!password_verify($password, $user["password"])) {
+      $_SESSION['error'] = 'password-incorrect';
+      $this->fileto('edit');
+      Header("Location: /profile-settings");
+      exit();
+    } else if ($this->edit_userbase_name($email, $name)) {
+      unset($_SESSION['error']);
+      $_SESSION['user'] = $this->read($email, null);
+      $_SESSION['success'] = true;
+      $this->fileto('edit');
+      Header("Location: /profile-settings");
+      exit();
+    } else {
+      $_SESSION['error'] = 'invalid-request';
+      $this->fileto('edit');
+      Header("Location: /profile-settings");
+      exit();
+    }
+
+  }
+
+
+  public function signout()
+  {
+    $this->validate_signout();
+    $this->fileto('signout');
+    setcookie('auth', false, time() - 1, '/', 'localhost', true, true);
+    unset($_SESSION['logged']);
+    Header("Location: /sign-in");
+    exit();
+  }
+
 }
 
 $userbase_controller = new Userbase_controller();
@@ -369,8 +403,10 @@ $userbase_controller = new Userbase_controller();
 if ($request === '/register-user')
   $userbase_controller->validate_registration();
 else if ($request === '/signin-user')
-  $userbase_controller->validate_signin();
+  $userbase_controller->validate_user_request('signin', 'sign-in', $_POST['email'], $_POST['password']);
 else if ($request === '/delete-user')
-  $userbase_controller->delete_user();
+  $userbase_controller->validate_user_request('delete', 'profile-settings', $_POST['email'], $_POST['password']);
+else if ($request === '/edit-user-name')
+  $userbase_controller->edit_user_name();
 else
   $userbase_controller->signout();

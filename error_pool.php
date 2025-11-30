@@ -13,6 +13,7 @@ $registration_error_pool = [
   'password-short' => 'Password must contain at least 10 characters',
   'password-number' => 'Password must contain at least 1 number',
   'password-symbol' => 'Password must contain at least 1 symbol',
+  'password-incorrect' => "You've entered the wrong password",
   'password-mismatch' => "passwords don't match",
   're_password-invalid' => "Re-password field can't be left empty",
   'name-empty' => "Name field can't be left empty",

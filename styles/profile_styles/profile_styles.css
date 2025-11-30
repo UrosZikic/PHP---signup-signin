@@ -20,3 +20,27 @@
 .remove_bubble {
   transform: translateX(240px);
 }
+
+/* border-bubble */
+.border_bubble {
+  background-color: var(--error-bubble-color);
+  width: 100%;
+  max-width: 30rem;
+  padding: 2rem;
+  border-top-right-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  margin: 5rem 0;
+}
+.edit_bubble {
+  background-color: var(--edit-bubble-color);
+}
+.border_bubble p {
+  color: var(--blank-color);
+}
+.edit_bubble a {
+  background-color: var(--edit-color);
+}
+
+.success_bubble {
+  background-color: var(--success-bubble-color);
+}

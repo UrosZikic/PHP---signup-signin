@@ -46,4 +46,14 @@ class Userbase extends Connect_Database
     $stmt->execute();
     return true;
   }
+
+  protected function edit_userbase_name($email, $name)
+  {
+    $query = "UPDATE `userbase` SET `name` = :name WHERE email = :email";
+    $stmt = $this->pdo->prepare($query);
+    $stmt->bindParam(":name", $name);
+    $stmt->bindParam(":email", $email);
+    $stmt->execute();
+    return true;
+  }
 }

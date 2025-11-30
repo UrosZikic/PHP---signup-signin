@@ -4,6 +4,18 @@
 }
 .submit_color {
   background-color: var(--submit-color);
+  color: var(--blank-color);
+  font-size: 1.5rem;
+  width: 100%;
+  max-width: 12rem;
+  padding: 1.15rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-family: roboto;
+}
+.delete_color {
+  background-color: var(--error-color);
+  max-width: 8rem;
 }
 .blank_background {
   background-color: var(--blank-color);
@@ -51,14 +63,6 @@
 }
 
 .form_layout button {
-  width: 100%;
-  max-width: 12rem;
-  padding: 1.15rem;
-  border-radius: 0.5rem;
-  border: none;
-  color: var(--blank-color);
-  font-size: 1.5rem;
-  font-family: roboto;
 }
 
 .form_info {

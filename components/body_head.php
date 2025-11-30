@@ -1,3 +1,8 @@
+<?php
+declare(strict_types=1);
+require __DIR__ . '/../environment/config/bootstrap.php';
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,8 +21,12 @@
   <link rel="stylesheet" href="<?php echo "/styles/general_styles/general_styles.css" ?>">
   <link rel="stylesheet" href="<?php echo "/styles/form_styles/form_styles.css" ?>">
   <link rel="stylesheet" href="<?php echo "/styles/profile_styles/profile_styles.css" ?>">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.png">
 
-  <title>placeholder title</title>
+
+  <title>
+    Profile management
+  </title>
 </head>
 
 
@@ -28,7 +37,7 @@
     </a>
     <ul class="flex_default nav_ul_list">
       <?php
-      if (!isset($_COOKIE['logged'])) {
+      if (!isset($_COOKIE['auth'])) {
         ?>
         <li>
           <a href="/sign-in">Sign-in</a>
@@ -44,7 +53,15 @@
         <li>
           <a href="/profile">Profile</a>
         </li>
-      <?php }
+        <?php
+        session_start();
+        if ($_SESSION['user']['email'] === $_ENV['EMAIL']) {
+          ?>
+          <li>
+            <a href="/admin-manager">Admin</a>
+          </li>
+        <?php }
+      }
       ; ?>
     </ul>
   </nav>

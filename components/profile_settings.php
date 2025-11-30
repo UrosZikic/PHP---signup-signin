@@ -1,5 +1,5 @@
 <?php
-if (!isset($_COOKIE['logged']))
+if (!isset($_COOKIE['auth']))
   Header("Location: /sign-in");
 
 // validate logged session and user session
@@ -17,11 +17,31 @@ if (!isset($_SESSION['logged']) || !isset($_SESSION['user']))
     </div>
   <?php }
   ; ?>
+  <!-- success bubble -->
+  <?php if (isset($_SESSION['success'])) { ?>
+    <div class="error_bubble success_bubble">
+      <p>Success</p>
+    </div>
+  <?php }
+  ;
+  unset($_SESSION['success'])
+    ?>
 
-  <h1 style="font-weight: 300; padding-left: 10px">Manage your profile: <?php echo $user['name'];
+  <h1 style="font-weight: 300; margin: 0 0 20px 10px">Manage your profile: <?php echo $user['name'];
   ?></h1>
-  <div>
-    <a href="/confirm-delete">Delete profile</a>
+  <div class="flex_default flex_column border_bubble">
+    <p style="margin: 0 0 0 10px">Delete your profile</p>
+    <a href="/confirm-delete" class="submit_color delete_color" style="margin: 0 0 0 10px">Proceed</a>
+  </div>
+
+  <div class="flex_default flex_column border_bubble edit_bubble">
+    <p style="margin: 0 0 0 10px">Change your name</p>
+    <a href="/change-name" class="submit_color delete_color" style="margin: 0 0 0 10px">Proceed</a>
+  </div>
+
+  <div class="flex_default flex_column border_bubble edit_bubble">
+    <p style="margin: 0 0 0 10px">Change your name</p>
+    <a href="/change-name" class="submit_color delete_color" style="margin: 0 0 0 10px">Proceed</a>
   </div>
 </main>
 <script>

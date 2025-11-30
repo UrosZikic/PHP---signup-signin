@@ -13,15 +13,19 @@ require_once 'error_pool.php';
 
 <div class="form_layout flex_default flex_column form_border">
   <div class="form_layout flex_default flex_column form_info">
-    <h3>Confirm and delete your profile</h3>
-    <h4>Please enter your details</h4>
-    <p class="error_field"><?php if (isset($_SESSION['error']) && isset($_GET['error']) && strlen($_GET['error']))
+    <h3>Edit your profile</h3>
+    <h4>Please enter a new name and confirm it with your log-in credentials</h4>
+    <p class="error_field"><?php if (isset($_SESSION['error']))
       echo $registration_error_pool[$_SESSION['error']] ?></p>
     </div>
-    <form action="delete-user" method="POST" class="form_layout flex_default flex_column">
+    <form action="edit-user-name" method="POST" class="form_layout flex_default flex_column">
       <input type="hidden" hidden name="csrf_token" value="<?php echo $csrf_token ?>">
     <div>
-      <label for="email" class="blank_background">email</label>
+      <label for="name" class="blank_background">Change your name</label>
+      <input type="text" name="name" id="name" required>
+    </div>
+    <div>
+      <label for="email" class="blank_background">Email</label>
       <input type="email" name="email" id="email" required>
     </div>
     <div>
@@ -31,3 +35,6 @@ require_once 'error_pool.php';
     <button type="submit" value="sign_in" class="submit_color">Delete</button>
   </form>
 </div>
+
+
+<?php unset($_SESSION['error']) ?>

@@ -1,7 +1,10 @@
 :root {
   --error-color: #c92a2a;
   --error-bubble-color: #ffa8a8;
+  --edit-bubble-color: #ffc078;
+  --edit-color: #ff922b;
   --submit-color: #2a5c85;
+  --success-bubble-color: #69db7c;
   --blank-color: #fff;
   --sub-heading-color: #e9ecef;
   --link-color: #3e4247;
@@ -89,4 +92,9 @@ h4 {
 /* list */
 li {
   list-style: none;
+}
+
+/* text */
+p {
+  font-size: 1.5rem;
 }

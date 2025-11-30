@@ -26,11 +26,19 @@ switch ($request) {
   case '/confirm-delete':
     require_once __DIR__ . "../front_page/views/delete_user.php";
     break;
+  case '/change-name':
+    require_once __DIR__ . "../front_page/views/edit_user_name.php";
+    break;
+  case '/edit-user-name':
+    require_once __DIR__ . "../controllers/Userbase_Controller.php";
+    break;
   case '/profile':
   case '/profile-settings':
     require_once __DIR__ . "../front_page/views/profile.php";
     break;
-
+  case '/admin-manager':
+    require_once __DIR__ . "../front_page/views/profile.php";
+    break;
   default:
     require_once __DIR__ . "/errors/404.php";
     break;

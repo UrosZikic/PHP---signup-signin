@@ -7,4 +7,5 @@ composer.lock
 registration_attempt.txt
 signin_attempt.txt
 signout_attempt.txt
+edit_attempt.txt
 .env
