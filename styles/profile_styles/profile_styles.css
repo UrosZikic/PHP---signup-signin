@@ -30,6 +30,7 @@
   border-top-right-radius: 1rem;
   border-bottom-right-radius: 1rem;
   margin: 5rem 0;
+  transition: all 1s ease;
 }
 .edit_bubble {
   background-color: var(--edit-bubble-color);
@@ -43,4 +44,16 @@
 
 .success_bubble {
   background-color: var(--success-bubble-color);
+}
+.success_color {
+  background-color: var(--success-color);
+}
+
+.load_bubble {
+  transform: translateX(-30rem);
+  /* transition: all 1.5; */
+}
+
+.load_in {
+  transform: translateX(0);
 }

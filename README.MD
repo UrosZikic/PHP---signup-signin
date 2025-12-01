@@ -17,10 +17,9 @@
 ---
 
 - Set up the database, userbase table and the default admin_user
-- - open SQL/create_userbase.php file and you're good.
+  -- After you've set up your environment, just open create_userbase.php file in the SQL folder and you'd be good to start.
 
 ---
 
 - Filesystem
-  - Don't worry about it being empty, on user register, login or logout attempt it will receive logging files.
-  - You don't need to create anything manually.
+  - On registration, signin, signout or edit attempt a folder 'filesystem' will be automatically created, each separate attempt will be stored in its own file.

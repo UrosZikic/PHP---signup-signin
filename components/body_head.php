@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 require __DIR__ . '/../environment/config/bootstrap.php';
+session_start();
+
 
 ?>
 <!DOCTYPE html>
@@ -21,6 +23,8 @@ require __DIR__ . '/../environment/config/bootstrap.php';
   <link rel="stylesheet" href="<?php echo "/styles/general_styles/general_styles.css" ?>">
   <link rel="stylesheet" href="<?php echo "/styles/form_styles/form_styles.css" ?>">
   <link rel="stylesheet" href="<?php echo "/styles/profile_styles/profile_styles.css" ?>">
+  <link rel="stylesheet" href="<?php echo "/styles/admin_styles/admin_styles.css" ?>">
+
   <link rel="icon" type="image/x-icon" href="/images/favicon.png">
 
 
@@ -28,6 +32,16 @@ require __DIR__ . '/../environment/config/bootstrap.php';
     Profile management
   </title>
 </head>
+<?php
+function auth()
+{
+  if ($_SESSION['user']['email'] === $_ENV['EMAIL'])
+    return true;
+  else
+    return false;
+}
+;
+?>
 
 
 <body>
@@ -54,8 +68,7 @@ require __DIR__ . '/../environment/config/bootstrap.php';
           <a href="/profile">Profile</a>
         </li>
         <?php
-        session_start();
-        if ($_SESSION['user']['email'] === $_ENV['EMAIL']) {
+        if (auth()) {
           ?>
           <li>
             <a href="/admin-manager">Admin</a>

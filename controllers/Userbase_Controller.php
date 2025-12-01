@@ -1,7 +1,7 @@
 <?php
 // __DIR__ resolves pathing issue
 require_once __DIR__ . '/../models/Userbase.php';
-session_start();
+// session_start();
 // reset on visit
 $_SESSION['error'] = "";
 // necessary in order to call the right function
@@ -382,7 +382,69 @@ class Userbase_controller extends Userbase
       Header("Location: /profile-settings");
       exit();
     }
+  }
 
+  public function edit_user_password()
+  {
+    $email = $_POST['email'] ?? false;
+    $old_password = $_POST['old_password'] ?? false;
+    $new_password = $_POST['new_password'] ?? false;
+    $re_password = $_POST['re_password'] ?? false;
+
+
+    if ($new_password !== $re_password) {
+      $_SESSION['error'] = "password-bad-match";
+      $this->fileto('edit');
+      Header("Location: /profile-settings");
+    }
+    $hash_password = password_hash($new_password, PASSWORD_DEFAULT);
+
+    $this->validate_user_request('edit', '/profile-settings', $email, $old_password);
+
+
+    // same code in the edit name section -- some changes though
+    $user = $this->read($email);
+    if (!$user) {
+      $_SESSION['error'] = 'email-invalid';
+      $this->fileto('edit');
+
+      Header("Location: /profile-settings");
+      exit();
+    } else if (!password_verify($old_password, $user["password"])) {
+      $_SESSION['error'] = 'password-incorrect';
+      $this->fileto('edit');
+      Header("Location: /profile-settings");
+      exit();
+    } else if ($this->edit_userbase_password($email, $hash_password)) {
+      unset($_SESSION['error']);
+      $_SESSION['user'] = $this->read($email, null);
+      $_SESSION['success'] = true;
+      $this->fileto('edit');
+      Header("Location: /profile-settings");
+      exit();
+    } else {
+      $_SESSION['error'] = 'invalid-request';
+      $this->fileto('edit');
+      Header("Location: /profile-settings");
+      exit();
+    }
+  }
+
+  public function get_users()
+  {
+    if ($this->get_userbase()) {
+      $users = $this->get_userbase();
+      unset($_SESSION['error']);
+      require_once 'admin/admin_users.php';
+    }
+  }
+  public function get_softdeleted_users()
+  {
+    if ($this->get_softdeleted_userbase()) {
+      $users = $this->get_softdeleted_userbase();
+      unset($_SESSION['error']);
+      require_once 'admin/admin_users.php';
+    }
   }
 
 
@@ -396,17 +458,44 @@ class Userbase_controller extends Userbase
     exit();
   }
 
+  public function admin_delete_user()
+  {
+    $email = $_GET['user'];
+    $this->soft_delete($email);
+    Header("Location: /get-users");
+  }
+
 }
 
 $userbase_controller = new Userbase_controller();
 
-if ($request === '/register-user')
-  $userbase_controller->validate_registration();
-else if ($request === '/signin-user')
-  $userbase_controller->validate_user_request('signin', 'sign-in', $_POST['email'], $_POST['password']);
-else if ($request === '/delete-user')
-  $userbase_controller->validate_user_request('delete', 'profile-settings', $_POST['email'], $_POST['password']);
-else if ($request === '/edit-user-name')
-  $userbase_controller->edit_user_name();
-else
-  $userbase_controller->signout();
+switch ($request) {
+  case '/register-user':
+    $userbase_controller->validate_registration();
+    break;
+  case '/signin-user':
+    $userbase_controller->validate_user_request('signin', 'sign-in', $_POST['email'], $_POST['password']);
+    break;
+  case '/delete-user':
+    $userbase_controller->validate_user_request('delete', 'profile-settings', $_POST['email'], $_POST['password']);
+    break;
+  case '/edit-user-name':
+    $userbase_controller->edit_user_name();
+    break;
+  case '/edit-user-password':
+    $userbase_controller->edit_user_password();
+    break;
+  case '/get-users':
+    $userbase_controller->get_users();
+    break;
+  case '/get-deleted-users':
+    $userbase_controller->get_softdeleted_users();
+    break;
+  case '/admin-delete-user':
+    $userbase_controller->admin_delete_user();
+    break;
+  default:
+    $userbase_controller->signout();
+    break;
+}
+

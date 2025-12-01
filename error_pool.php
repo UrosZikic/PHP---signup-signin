@@ -22,5 +22,6 @@ $registration_error_pool = [
   'user-exists' => "The user under this email is already registered",
   'user-fail' => "The user doesn't exist",
   'password-fail' => "The password doesn't match",
+  'password-bad-match' => "Passwords don't match",
   '' => ''
 ];
