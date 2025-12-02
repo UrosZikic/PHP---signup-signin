@@ -45,7 +45,9 @@ body {
 .flex_justify_center {
   justify-content: center;
 }
-
+.flex_justify_start {
+  justify-content: start;
+}
 /* navigation */
 nav {
   position: fixed;

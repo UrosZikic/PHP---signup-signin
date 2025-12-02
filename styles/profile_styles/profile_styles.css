@@ -57,3 +57,58 @@
 .load_in {
   transform: translateX(0);
 }
+
+.profile_image {
+  width: 100%;
+  max-width: 7.5rem;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background-color: white;
+  overflow: hidden;
+  border: 1px solid black;
+}
+.profile_image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.remove_upload_modal {
+  display: none;
+}
+.upload_modal {
+  position: fixed;
+  top: 30%;
+  left: 40%;
+
+  width: 100%;
+  padding: 5rem;
+  max-width: 30rem;
+  border: 2px solid gray;
+}
+.upload_modal form input {
+  display: none;
+}
+.upload_modal form label {
+  height: 100px;
+  width: 150px;
+  border-radius: 5px;
+  border: 1px dashed gray;
+}
+.image_upload_icon {
+  font-size: 10rem !important;
+}
+.upload_modal form button[type="submit"] {
+  width: 100%;
+  max-width: 15rem;
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 1.5rem;
+  margin-top: 10px;
+}
+
+.quit_modal {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  font-size: 2.5rem;
+}

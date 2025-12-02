@@ -13,19 +13,23 @@ $_SESSION['request'] = $request;
 
 class Userbase_controller extends Userbase
 {
+  private string $name;
+  private string $email;
+  private string $password;
+  private string $re_password;
   public function validate_registration()
   {
     // validate input values
-    $name = $_POST['name'] ?? false;
-    $email = $_POST['email'] ?? false;
-    $password = $_POST['password'] ?? false;
-    $re_password = $_POST['re_password'] ?? false;
+    $this->name = $_POST['name'] ?? false;
+    $this->email = $_POST['email'] ?? false;
+    $this->password = $_POST['password'] ?? false;
+    $this->re_password = $_POST['re_password'] ?? false;
 
 
     // validate CSRF
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
       $_SESSION['error'] = 'invalid-request';
-      $this->fileto('register');
+      $this->fileto(path: 'register');
 
       Header("Location: /register");
       exit();
@@ -34,28 +38,28 @@ class Userbase_controller extends Userbase
     // validate request
     if ($_SERVER['REQUEST_METHOD'] === "POST") {
 
-      if (!$name) {
+      if (!$this->name) {
         $_SESSION['error'] = 'name-invalid';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
         Header("Location: /register");
         exit();
 
-      } else if (!$email) {
+      } else if (!$this->email) {
         $_SESSION['error'] = 'email-invalid';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
 
         Header("Location: /register");
         exit();
 
-      } else if (!$password) {
+      } else if (!$this->password) {
         $_SESSION['error'] = 'password-invalid';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
         Header("Location: /register");
         exit();
 
-      } else if (!$re_password) {
+      } else if (!$this->re_password) {
         $_SESSION['error'] = 're_password-invalid';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
 
         Header("Location: /register");
         exit();
@@ -64,32 +68,32 @@ class Userbase_controller extends Userbase
 
 
       // validate username
-      if (empty($name)) {
+      if (empty($this->name)) {
         $_SESSION['error'] = 'name-empty';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
 
         Header("Location: /register");
         exit();
 
-      } else if (preg_match('/\d/', $name)) {
+      } else if (preg_match('/\d/', $this->name)) {
         $_SESSION['error'] = 'name-number';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
 
         Header("Location: /register");
         exit();
 
       }
       // validate email 
-      if (empty($email)) {
+      if (empty($this->email)) {
         $_SESSION['error'] = 'email-empty';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
 
         Header("Location: /register");
         exit();
 
-      } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      } else if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
         $_SESSION['error'] = 'email-invalid';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
 
         Header("Location: /register");
         exit();
@@ -97,66 +101,66 @@ class Userbase_controller extends Userbase
       }
 
       //validate password
-      if (empty($password)) {
+      if (empty($this->password)) {
         $_SESSION['error'] = 'password-empty';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
         Header("Location: /register");
         exit();
 
-      } else if (!preg_match('/[A-Z]/', $password)) {
+      } else if (!preg_match('/[A-Z]/', $this->password)) {
         $_SESSION['error'] = 'password-capitalize';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
         Header("Location: /register");
         exit();
 
-      } else if (!preg_match('/[a-z]/', $password)) {
+      } else if (!preg_match('/[a-z]/', $this->password)) {
         $_SESSION['error'] = 'password-letter';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
         Header("Location: /register");
         exit();
 
-      } else if (!preg_match('/.{10,}/', $password)) {
+      } else if (!preg_match('/.{10,}/', $this->password)) {
         $_SESSION['error'] = 'password-short';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
         Header("Location: /register");
         exit();
 
-      } else if (!preg_match('/\d/', $password)) {
+      } else if (!preg_match('/\d/', $this->password)) {
         $_SESSION['error'] = 'password-number';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
         Header("Location: /register");
         exit();
 
-      } else if (!preg_match('/[\W_]/', $password)) {
+      } else if (!preg_match('/[\W_]/', $this->password)) {
         $_SESSION['error'] = 'password-symbol';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
         Header("Location: /register");
         exit();
 
-      } else if ($password !== $re_password) {
+      } else if ($this->password !== $this->re_password) {
         $_SESSION['error'] = 'password-mismatch';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
         Header("Location: /register");
         exit();
       }
       // validate if email is unique
-      if (!$this->read($email, 'register')) {
-        $this->create($name, $email, $password);
+      if (!$this->read(email: $this->email, path: 'register')) {
+        $this->create(name: $this->name, email: $this->email, password: $this->password);
       } else {
         $_SESSION['error'] = 'user-exists';
-        $this->fileto('register');
+        $this->fileto(path: 'register');
         Header("Location: /register");
         exit();
       }
     } else {
       $_SESSION['error'] = 'invalid-request';
-      $this->fileto('register');
+      $this->fileto(path: 'register');
       Header("Location: /register");
       exit();
     }
   }
 
-  private function fileto($path)
+  private function fileto(string $path)
   {
 
     //document registration attempt
@@ -179,31 +183,31 @@ class Userbase_controller extends Userbase
     }
   }
 
-  private function read($email, $path = null)
+  private function read(string $email, string|null $path = null)
   {
     try {
       // call Userbase model
-      return $this->read_from_userbase($email, $path);
+      return $this->read_from_userbase(email: $this->email, path: $path);
     } catch (PDOException $e) {
       $_SESSION['error'] = 'validation failed';
-      $this->fileto($path);
+      $this->fileto(path: $path);
       Header("Location: /register");
       exit();
     }
   }
 
 
-  private function create($name, $email, $password)
+  private function create(string $name, string $email, string $password)
   {
 
     try {
-      $password_hashed = password_hash($password, PASSWORD_DEFAULT);
+      $password_hashed = password_hash($this->password, PASSWORD_DEFAULT);
       // call Userbase model function and insert data
-      $this->insert_into_userbase($name, $email, $password_hashed);
+      $this->insert_into_userbase(name: $this->name, email: $this->email, password: $password_hashed);
       // success no errors
       $_SESSION['error'] = null;
       // record this attempt
-      $this->fileto('register');
+      $this->fileto(path: 'register');
       // send the user to the next step
       header("Location: /sign-in");
       exit();
@@ -211,23 +215,23 @@ class Userbase_controller extends Userbase
     } catch (PDOException $e) {
       $_SESSION['error_message'] = $e->getMessage();
       $_SESSION['error'] = 'invalid-request';
-      $this->fileto('register');
+      $this->fileto(path: 'register');
       Header("Location: /register");
       exit();
     }
   }
 
-  public function validate_user_request($fileto, $header, $email_post, $password_post)
+  public function validate_user_request(string $fileto, string $header, string $email_post, string $password_post)
   {
     // validate input values
-    $email = $email_post ?? false;
-    $password = $password_post ?? false;
+    $this->email = $email_post ?? false;
+    $this->password = $password_post ?? false;
 
 
     // validate CSRF
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
       $_SESSION['error'] = 'invalid-request';
-      $this->fileto($fileto);
+      $this->fileto(path: $fileto);
       Header("Location: /$header");
       exit();
     }
@@ -235,13 +239,13 @@ class Userbase_controller extends Userbase
     // validate if they exist
     if ($_SERVER['REQUEST_METHOD'] === "POST") {
       // validate email
-      if (!$email) {
+      if (!$this->email) {
         $_SESSION['error'] = 'email-invalid';
         $this->fileto($fileto);
         Header("Location: /$header");
         exit();
         // validate password
-      } else if (!$password) {
+      } else if (!$this->password) {
         $_SESSION['error'] = 'password-invalid';
         $this->fileto($fileto);
         Header("Location: /$header");
@@ -250,9 +254,9 @@ class Userbase_controller extends Userbase
 
 
       if ($fileto === 'signin') {
-        $this->signin($email, $password);
+        $this->signin($this->email, $this->password);
       } else if ($fileto === 'delete')
-        $this->delete_user($email, $password);
+        $this->delete_user($this->email, $this->password);
 
     } else {
       // if request method is not post, cancel signin
@@ -261,32 +265,34 @@ class Userbase_controller extends Userbase
       Header("Location: /$header");
       exit();
     }
-
   }
 
-  private function signin($email, $password)
+  private function signin(string $email, string $password)
   {
-    if (!$this->read($email, 'signin')) {
+    $this->email = $email;
+    $this->password = $password;
+
+    if (!$this->read($this->email, 'signin') || $this->read($this->email, 'signin')['soft_deleted']) {
       $_SESSION['error'] = 'user-fail';
       $this->fileto('signin');
       Header("Location: /sign-in");
       exit();
     } else {
-      $password_verify = password_verify($password, $this->read($email, 'signin')["password"]);
+      $password_verify = password_verify($this->password, $this->read($this->email, 'signin')["password"]);
       $password_verify = $password_verify ? true : false;
 
       if ($password_verify) {
         // if password checksout approve signin
         $_SESSION['error'] = null;
-        $_SESSION['logged'] = ["email" => $this->read($email, 'signin')["email"], "name" => $this->read($email, 'signin')["name"]];
-        $_SESSION['user'] = $this->read($email, null);
+        $_SESSION['logged'] = ["email" => $this->read($this->email, 'signin')["email"], "name" => $this->read($this->email, 'signin')["name"]];
+        $_SESSION['user'] = $this->read(email: $this->email, path: null);
         $this->fileto('signin');
         setcookie('auth', true, time() + 1800, '/', 'localhost', true, true);
         Header("Location: /profile");
         exit();
       } else {
         $_SESSION['error'] = 'password-fail';
-        $this->fileto('signin');
+        $this->fileto(path: 'signin');
         Header("Location: /sign-in");
         exit();
       }
@@ -294,9 +300,12 @@ class Userbase_controller extends Userbase
   }
 
 
-  private function delete_user($email, $password)
+  private function delete_user(string $email, string $password)
   {
-    if (!$this->read($email, 'signin')) {
+    $this->email = $email;
+    $this->password = $password;
+
+    if (!$this->read(email: $this->email, path: 'signin')) {
       $_SESSION['error'] = 'user-fail';
       $this->fileto('delete');
       Header("Location: /profile-settings");
@@ -304,14 +313,14 @@ class Userbase_controller extends Userbase
 
     } else {
       // if the user tries deleting someone else's profile, the action will be aborted
-      if ($_SESSION['user']['email'] !== $this->read($email, null)['email']) {
+      if ($_SESSION['user']['email'] !== $this->read(email: $this->email, path: null)['email']) {
         $_SESSION['error'] = 'invalid email provided';
-        $this->fileto('delete');
+        $this->fileto(path: 'delete');
         Header("Location: /profile-settings");
         exit();
       }
 
-      $password_verify = password_verify($password, $this->read($email, 'delete')["password"]);
+      $password_verify = password_verify($this->password, $this->read(email: $this->email, path: 'delete')["password"]);
       $password_verify = $password_verify ? true : false;
 
       if ($password_verify) {
@@ -319,15 +328,15 @@ class Userbase_controller extends Userbase
         $_SESSION['error'] = null;
         $_SESSION['logged'] = null;
         $_SESSION['user'] = null;
-        $this->fileto('delete');
+        $this->fileto(path: 'delete');
         setcookie('auth', false, time() - 1, '/', 'localhost', true, true);
-        $this->delete_from_userbase($email);
+        $this->delete_from_userbase(email: $this->email);
         Header("Location: /home");
         exit();
 
       } else {
         $_SESSION['error'] = 'password-fail';
-        $this->fileto('delete');
+        $this->fileto(path: 'delete');
 
         Header("Location: /profile-settings");
         exit();
@@ -337,41 +346,41 @@ class Userbase_controller extends Userbase
   }
   public function edit_user_name()
   {
-    $name = $_POST['name'] ?? false;
-    $email = $_POST['email'] ?? false;
-    $password = $_POST['password'] ?? false;
+    $this->name = $_POST['name'] ?? false;
+    $this->email = $_POST['email'] ?? false;
+    $this->password = $_POST['password'] ?? false;
 
     // validate username
-    if (empty($name)) {
+    if (empty($this->name)) {
       $_SESSION['error'] = 'name-empty';
-      $this->fileto('edit');
+      $this->fileto(path: 'edit');
 
       Header("Location: /profile-settings");
       exit();
 
-    } else if (preg_match('/\d/', $name)) {
+    } else if (preg_match('/\d/', $this->name)) {
       $_SESSION['error'] = 'name-number';
-      $this->fileto('edit');
+      $this->fileto(path: 'edit');
       Header("Location: /profile-settings");
       exit();
 
     }
-    $this->validate_user_request('edit', 'change-name', $email, $password);
-    $user = $this->read($email);
+    $this->validate_user_request(fileto: 'edit', header: 'change-name', email_post: $this->email, password_post: $this->password);
+    $user = $this->read(email: $this->email);
     if (!$user) {
       $_SESSION['error'] = 'email-invalid';
       $this->fileto('edit');
 
       Header("Location: /profile-settings");
       exit();
-    } else if (!password_verify($password, $user["password"])) {
+    } else if (!password_verify($this->password, $user["password"])) {
       $_SESSION['error'] = 'password-incorrect';
       $this->fileto('edit');
       Header("Location: /profile-settings");
       exit();
-    } else if ($this->edit_userbase_name($email, $name)) {
+    } else if ($this->edit_userbase_name(email: $this->email, name: $this->name)) {
       unset($_SESSION['error']);
-      $_SESSION['user'] = $this->read($email, null);
+      $_SESSION['user'] = $this->read($this->email, null);
       $_SESSION['success'] = true;
       $this->fileto('edit');
       Header("Location: /profile-settings");
@@ -386,7 +395,7 @@ class Userbase_controller extends Userbase
 
   public function edit_user_password()
   {
-    $email = $_POST['email'] ?? false;
+    $this->email = $_POST['email'] ?? false;
     $old_password = $_POST['old_password'] ?? false;
     $new_password = $_POST['new_password'] ?? false;
     $re_password = $_POST['re_password'] ?? false;
@@ -399,32 +408,32 @@ class Userbase_controller extends Userbase
     }
     $hash_password = password_hash($new_password, PASSWORD_DEFAULT);
 
-    $this->validate_user_request('edit', '/profile-settings', $email, $old_password);
+    $this->validate_user_request(fileto: 'edit', header: '/profile-settings', email_post: $this->email, password_post: $old_password);
 
 
     // same code in the edit name section -- some changes though
-    $user = $this->read($email);
+    $user = $this->read(email: $this->email);
     if (!$user) {
       $_SESSION['error'] = 'email-invalid';
-      $this->fileto('edit');
+      $this->fileto(path: 'edit');
 
       Header("Location: /profile-settings");
       exit();
     } else if (!password_verify($old_password, $user["password"])) {
       $_SESSION['error'] = 'password-incorrect';
-      $this->fileto('edit');
+      $this->fileto(path: 'edit');
       Header("Location: /profile-settings");
       exit();
-    } else if ($this->edit_userbase_password($email, $hash_password)) {
+    } else if ($this->edit_userbase_password(email: $this->email, hash_password: $hash_password)) {
       unset($_SESSION['error']);
-      $_SESSION['user'] = $this->read($email, null);
+      $_SESSION['user'] = $this->read(email: $this->email, path: null);
       $_SESSION['success'] = true;
-      $this->fileto('edit');
+      $this->fileto(path: 'edit');
       Header("Location: /profile-settings");
       exit();
     } else {
       $_SESSION['error'] = 'invalid-request';
-      $this->fileto('edit');
+      $this->fileto(path: 'edit');
       Header("Location: /profile-settings");
       exit();
     }
@@ -436,6 +445,8 @@ class Userbase_controller extends Userbase
       $users = $this->get_userbase();
       unset($_SESSION['error']);
       require_once 'admin/admin_users.php';
+    } else {
+      require_once 'admin/admin_blank_users.php';
     }
   }
   public function get_softdeleted_users()
@@ -443,7 +454,10 @@ class Userbase_controller extends Userbase
     if ($this->get_softdeleted_userbase()) {
       $users = $this->get_softdeleted_userbase();
       unset($_SESSION['error']);
+
       require_once 'admin/admin_users.php';
+    } else {
+      require_once 'admin/admin_blank_users.php';
     }
   }
 
@@ -451,7 +465,7 @@ class Userbase_controller extends Userbase
   public function signout()
   {
     $this->validate_signout();
-    $this->fileto('signout');
+    $this->fileto(path: 'signout');
     setcookie('auth', false, time() - 1, '/', 'localhost', true, true);
     unset($_SESSION['logged']);
     Header("Location: /sign-in");
@@ -460,9 +474,47 @@ class Userbase_controller extends Userbase
 
   public function admin_delete_user()
   {
-    $email = $_GET['user'];
-    $this->soft_delete($email);
+    $this->email = $_GET['user'];
+    $this->soft_delete(email: $this->email);
     Header("Location: /get-users");
+  }
+
+  public function admin_restore_user()
+  {
+    $this->email = $_GET['email'];
+    $this->restore_user(email: $this->email);
+    $_SESSION['success'] = true;
+    Header("Location: /admin-manager");
+    exit();
+  }
+
+  public function upload_profile_image()
+  {
+    $this->email = $_POST['email'];
+
+    if (isset($_FILES['file']['name'])) {
+      $upload_dir = "images/profile_images/";
+
+      if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0777, true);
+      }
+
+      $target_file = $upload_dir . $_FILES['file']['name'];
+
+      // remove previous image from the localfiles
+      $user = $this->read_from_userbase(email: $this->email);
+      unlink($user['image_path']);
+
+      // upload the new image and update your SQL entry
+      $this->upload_image_path(email: $this->email, path: $target_file);
+      $_SESSION['user'] = $this->read_from_userbase($this->email);
+      move_uploaded_file($_FILES['file']['tmp_name'], $target_file);
+      Header("Location: /user-details");
+      exit();
+
+    } else {
+      echo 'image upload failed';
+    }
   }
 
 }
@@ -493,6 +545,12 @@ switch ($request) {
     break;
   case '/admin-delete-user':
     $userbase_controller->admin_delete_user();
+    break;
+  case '/admin-restore-user':
+    $userbase_controller->admin_restore_user();
+    break;
+  case '/upload-profile-image':
+    $userbase_controller->upload_profile_image();
     break;
   default:
     $userbase_controller->signout();

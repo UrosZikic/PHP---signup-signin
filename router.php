@@ -2,8 +2,11 @@
 
 $request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-if (str_contains($request, ".php")) {
+
+
+if (str_contains($request, ".")) {
   $request = "/";
+  Header("Location: $request");
 }
 
 switch ($request) {
@@ -23,6 +26,8 @@ switch ($request) {
   case '/get-users':
   case '/get-deleted-users':
   case '/admin-delete-user':
+  case '/admin-restore-user':
+  case '/upload-profile-image':
     require_once __DIR__ . "../controllers/Userbase_Controller.php";
     break;
   case '/sign-in':
@@ -46,6 +51,9 @@ switch ($request) {
     break;
   case '/user-details':
     require_once __DIR__ . "../components/user_details.php";
+    break;
+  case '/expensly':
+    require_once __DIR__ . "../project_expensly/expensly.php";
     break;
   default:
     require_once __DIR__ . "/errors/404.php";

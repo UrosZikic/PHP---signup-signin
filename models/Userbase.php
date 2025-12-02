@@ -29,6 +29,7 @@ class Userbase extends Connect_Database
 
   protected function read_from_userbase($email, $path = null)
   {
+    // path was supposed to have a role in this initially, but I changed my mind during development. I left it in just in case something changes in the future.
     $query = "SELECT * FROM userbase WHERE email = :email";
     $stmt = $this->pdo->prepare($query);
     $stmt->bindParam(":email", $email);
@@ -68,14 +69,14 @@ class Userbase extends Connect_Database
 
   protected function get_userbase()
   {
-    $query = "SELECT * FROM `userbase`";
+    $query = "SELECT * FROM `userbase` WHERE `soft_deleted` = 0 AND `role` = 'user'";
     $stmt = $this->pdo->query($query);
     $stmt->execute();
     return $stmt->fetchAll();
   }
 
 
-  protected function soft_delete($email)
+  protected function soft_delete(string $email)
   {
     $query = "SELECT `soft_deleted` FROM `userbase` WHERE email = :email";
     $stmt = $this->pdo->prepare($query);
@@ -98,6 +99,15 @@ class Userbase extends Connect_Database
     }
   }
 
+  protected function restore_user(string $email)
+  {
+    $query = "UPDATE `userbase` SET `soft_deleted` = 0 WHERE email = :email";
+    $stmt = $this->pdo->prepare($query);
+    $stmt->bindParam(":email", $email);
+    $stmt->execute();
+    return true;
+  }
+
 
   protected function get_softdeleted_userbase()
   {
@@ -105,5 +115,15 @@ class Userbase extends Connect_Database
     $stmt = $this->pdo->query($query);
     $stmt->execute();
     return $stmt->fetchAll();
+  }
+
+
+  protected function upload_image_path(string $email, string $path)
+  {
+    $query = "UPDATE `userbase` SET `image_path` = :path WHERE `email` = :email";
+    $stmt = $this->pdo->prepare($query);
+    $stmt->bindParam(":path", $path);
+    $stmt->bindParam(":email", $email);
+    $stmt->execute();
   }
 }

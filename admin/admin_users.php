@@ -6,6 +6,7 @@ $request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 <main>
   <table>
     <tr>
+      <th>Avatar</th>
       <th>Name</th>
       <th>Email</th>
       <th>Status</th>
@@ -16,13 +17,16 @@ $request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
       foreach ($users as $user) {
         if ($user['role'] !== 'admin' && $user['soft_deleted'] !== 1) { ?>
           <tr>
+            <td><img class="profile_image"
+                src="<?php echo $user['image_path'] ? $user['image_path'] : '../images/logo.png' ?>"
+                alt="<?php echo $user['name'] . "'s profile image" ?>"></td>
             <td><?php echo $user['name'] ?></td>
             <td><?php echo $user['email'] ?></td>
-            <td><?php echo isset($user['status']) ? "active" : "inactive"; ?></td>
+            <td style="color: var(--success-color)">active</td>
             <td>
-              <a href="/admin-edit-user">
+              <!-- <a href="/admin-edit-user">
                 <ion-icon name="pencil-sharp"></ion-icon>
-              </a>
+              </a> -->
               <a href="/admin-delete-user?user=<?php echo $user['email'] ?>">
                 <ion-icon name="trash-outline"></ion-icon>
               </a>
@@ -35,12 +39,15 @@ $request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
       foreach ($users as $user) {
         if ($user['role'] !== 'admin' && $user['soft_deleted'] !== 0) { ?>
             <tr>
+              <td><img class="profile_image"
+                  src="<?php echo $user['image_path'] ? $user['image_path'] : '../images/logo.png' ?>"
+                  alt="<?php echo $user['name'] . "'s profile image" ?>"></td>
               <td><?php echo $user['name'] ?></td>
               <td><?php echo $user['email'] ?></td>
-              <td><?php echo isset($user['status']) ? "active" : "inactive"; ?></td>
+              <td style="color: var(--error-color)">inactive</td>
               <td>
-                <a href="/admin-edit-user">
-                  <ion-icon name="pencil-sharp"></ion-icon>
+                <a href="/admin-restore-user?email=<?php echo $user['email'] ?>">
+                  <ion-icon name="refresh-outline"></ion-icon>
                 </a>
                 <a href="/admin-delete-user?user=<?php echo $user['email'] ?>">
                   <ion-icon name="trash-outline"></ion-icon>
@@ -51,7 +58,7 @@ $request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         }
       }
     } else
-    // Header("Location: /admin-manager")
-    ?>
-  </table>
-</main>
+      Header("Location: /admin-manager")
+        ?>
+      </table>
+    </main>

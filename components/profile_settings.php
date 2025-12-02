@@ -8,7 +8,7 @@ if (!isset($_SESSION['logged']) || !isset($_SESSION['user']))
 ?>
 <main>
   <!-- error bubble -->
-  <?php if (isset($_SESSION['error'])) { ?>
+  <?php if (isset($_SESSION['error']) && $_SESSION['error'] !== "") { ?>
     <div class="error_bubble">
       <p>Error occured...</p>
       <p><?php echo $_SESSION['error'];
