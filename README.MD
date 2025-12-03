@@ -23,3 +23,8 @@
 
 - Filesystem
   - On registration, signin, signout or edit attempt a folder 'filesystem' will be automatically created, each separate attempt will be stored in its own file.
+
+-- hosting set-up:
+
+1. Inside the SQL folder, make sure to update the hostname, username and the password based on your hosting service
+2. cookies are by default set to 'localhost', make sure to change this to your host provider's domain of your website

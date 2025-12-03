@@ -9,3 +9,4 @@ signin_attempt.txt
 signout_attempt.txt
 edit_attempt.txt
 .env
+.htaccess

@@ -25,9 +25,7 @@ session_start();
   <link rel="stylesheet" href="<?php echo "/styles/profile_styles/profile_styles.css" ?>">
   <link rel="stylesheet" href="<?php echo "/styles/admin_styles/admin_styles.css" ?>">
 
-  <link rel="icon" type="image/x-icon" href="/images/favicon.png">
-
-
+  <link rel="icon" type="image/x-icon" href="images/favicon.png">
   <title>
     Profile management
   </title>

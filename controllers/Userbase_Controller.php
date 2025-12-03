@@ -17,8 +17,26 @@ class Userbase_controller extends Userbase
   private string $email;
   private string $password;
   private string $re_password;
+
+  private function validate_csrf(string $path, string $uri)
+  {
+    // validate CSRF logic
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+      $_SESSION['error'] = 'invalid-request';
+      $this->fileto(path: $path);
+
+      Header("Location: $uri");
+      exit();
+    } else {
+      return true;
+    }
+  }
+
   public function validate_registration()
   {
+    // validate CSRF
+    $this->validate_csrf("register", "/register");
+
     // validate input values
     $this->name = $_POST['name'] ?? false;
     $this->email = $_POST['email'] ?? false;
@@ -26,14 +44,7 @@ class Userbase_controller extends Userbase
     $this->re_password = $_POST['re_password'] ?? false;
 
 
-    // validate CSRF
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-      $_SESSION['error'] = 'invalid-request';
-      $this->fileto(path: 'register');
 
-      Header("Location: /register");
-      exit();
-    }
 
     // validate request
     if ($_SERVER['REQUEST_METHOD'] === "POST") {
@@ -199,7 +210,8 @@ class Userbase_controller extends Userbase
 
   private function create(string $name, string $email, string $password)
   {
-
+    // validate CSRF
+    $this->validate_csrf("register", "/register");
     try {
       $password_hashed = password_hash($this->password, PASSWORD_DEFAULT);
       // call Userbase model function and insert data
@@ -269,6 +281,9 @@ class Userbase_controller extends Userbase
 
   private function signin(string $email, string $password)
   {
+    // validate CSRF
+    $this->validate_csrf("signin", "/sign-in");
+
     $this->email = $email;
     $this->password = $password;
 
@@ -302,6 +317,9 @@ class Userbase_controller extends Userbase
 
   private function delete_user(string $email, string $password)
   {
+    // validate CSRF
+    $this->validate_csrf("delete", "/profile");
+
     $this->email = $email;
     $this->password = $password;
 
@@ -346,6 +364,9 @@ class Userbase_controller extends Userbase
   }
   public function edit_user_name()
   {
+    // validate CSRF
+    $this->validate_csrf("edit", "/profile");
+
     $this->name = $_POST['name'] ?? false;
     $this->email = $_POST['email'] ?? false;
     $this->password = $_POST['password'] ?? false;
@@ -395,6 +416,9 @@ class Userbase_controller extends Userbase
 
   public function edit_user_password()
   {
+    // validate CSRF
+    $this->validate_csrf("edit", "/profile");
+
     $this->email = $_POST['email'] ?? false;
     $old_password = $_POST['old_password'] ?? false;
     $new_password = $_POST['new_password'] ?? false;
