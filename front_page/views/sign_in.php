@@ -1,6 +1,10 @@
 <?php
 $csrf_token = $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 require_once 'error_pool.php';
+
+if (isset($_COOKIE['auth'])) {
+  Header("Location: /");
+}
 ?>
 
 
