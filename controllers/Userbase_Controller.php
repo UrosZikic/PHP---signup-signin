@@ -303,6 +303,7 @@ class Userbase_controller extends Userbase
         $_SESSION['user'] = $this->read(email: $this->email, path: null);
         $this->fileto('signin');
         setcookie('auth', true, time() + 1800, '/', 'localhost', true, true);
+        setcookie('auth_user', $this->email, time() + 1800, '/', 'localhost', true, true);
         Header("Location: /profile");
         exit();
       } else {
@@ -364,6 +365,13 @@ class Userbase_controller extends Userbase
   }
   public function edit_user_name()
   {
+    if ($_COOKIE['auth_user'] !== $_POST['email']) {
+      $_SESSION['error'] = 'email-incorrect';
+      $this->fileto(path: 'edit');
+      Header("Location: /profile-settings");
+      exit();
+    }
+
     // validate CSRF
     $this->validate_csrf("edit", "/profile");
 
