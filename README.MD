@@ -28,3 +28,6 @@
 
 1. Inside the SQL folder, make sure to update the hostname, username and the password based on your hosting service
 2. cookies are by default set to 'localhost', make sure to change this to your host provider's domain of your website
+
+Changelog:
+4/24 - fixed cross-profile name changeing by implementing caching and comparing against the input on name change.
